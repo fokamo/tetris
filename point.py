@@ -2,7 +2,7 @@
 
 For external use:
 - Point class for representing a movable point
-- are_adj(one: Point, two: Point) function for checking if points are adjacent, i.e. orthogonally 1 unit apart
+- are_adj_points(one: Point, two: Point) -> bool function for checking if points are orthogonally 1 unit apart
 """
 
 from typing import Tuple
@@ -11,7 +11,8 @@ class Point:
     """A point in space
 
     For external use:
-    - .row() and .col() to get such position information
+    - .pos is (row, col) position
+    - .row() -> float and .col() -> float to get such position information
     - .down(), .up(), .left(), and .right() to move the Point 1 unit in such direction
     - .teleport(new_pos: Tuple[float, float]) to move the Point to a specified location
     - .__eq__(other), .__ne__(other), .__hash__(), and .__str__() overridden
@@ -62,7 +63,7 @@ class Point:
     def __str__(self) -> str:
         return str(self.pos)
 
-def are_adj(one: Point, two: Point) -> bool:
+def are_adj_points(one: Point, two: Point) -> bool:
     """Check if two Points are orthogonally adjacent to each other"""
 
     if one.row() == two.row():
