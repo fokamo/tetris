@@ -1,36 +1,29 @@
-"""button.py: for a Button class"""
+"""button.py - for a Button class
+
+For external use:
+- Button class for representing a clickable button
+"""
 
 import pygame
-import text, fonts
+import fonts
+from text import Text
 
 # required initialization step
 pygame.init()
 
-
 class Button(pygame.Rect):
     """A class to represent a button. Subclass of pygame.Rect.
-    Attributes:
-    left, top, width, height -- from Rect
-    _text -- Button's label
-    _color -- background color of the Button
-    Methods:
-    is_clicked -- checks if a given mouseclick-point is on the Button
-    draw -- draws the Button on a Surface
-    In all cases the origin (0, 0) is the top left corner
+
+    For external use:
+    - is_clicked(mouse_x: int, mouse_y: int) -> bool to check if a given mouseclick-point is on the Button
+    - .draw(screen: pygame.Surface) to draw the button
     """
 
-    def __init__(self, label: str, area: pygame.Rect, color: pygame.Color
-                 ) -> None:
-        """Initialize a Button.
-        text -- label on Button
-        area -- Rect where the Button should go
-        color -- background color of the Button
-        """
-
+    def __init__(self, label: str, area: pygame.Rect, color: pygame.Color) -> None:
         super().__init__(area)
 
         # make a text-surface to be blitted later
-        self._text = text.Text(label, fonts.BUTTON_FONT, self, color)
+        self._text = Text(label, fonts.BUTTON_FONT, self, color)
         self._color = color
 
     def is_clicked(self, mouse_x: int, mouse_y: int) -> bool:
