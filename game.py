@@ -1,3 +1,9 @@
+"""game.py - for a game screen class
+
+For external use:
+- Game class for a game screen
+"""
+
 from typing import Tuple
 
 import pygame
@@ -10,22 +16,31 @@ import screen
 # required initialization step
 pygame.init()
 
-
-SPEED_UP = -4
-SCORE_BETWEEN_SPEED_UPS = 5
-
 class Game(screen.Screen):
-    """Runs the game of Tetris"""
+    """A prepackaged Tetris-game screen. Subclass of Screen
+
+    For external use:
+    - .SCORE_BETWEEN_SPEED_UPS for how long to wait before speeding up the game clock
+    - .get_score() -> int to get the current board's score
+    """
+
+    SCORE_BETWEEN_SPEED_UPS = 3
+
     def __init__(self, window: pygame.Surface) -> None:
         super().__init__(window)
+
         height, width = window.get_height(), window.get_width()
+        # elements on screen
         self.board = Board((int(width / 5), int(height / 10)), (20, 10), 32)
-        self.quit_button = Button('Quit', pygame.Rect(0, 9 * height / 10, width / 3, height / 10), colors.BACK_COLOR)
+        self.board.get_new_falling_block()
+        self.quit_button = Button('Quit', pygame.Rect(0, 9 * height / 10, width / 3, height / 10),
+                                  colors.BACKWARD_COLOR)
         self.resign_button = Button('Resign', pygame.Rect(2 * width / 3, 9 * height / 10, width / 3, height / 10),
-                                    colors.BACK_COLOR)
+                                    colors.BACKWARD_COLOR)
+
+        # current state
         self.speed = Board.NORMAL_SPEED
-        self.board.new_falling_block()
-        self.next_score_milestone = SCORE_BETWEEN_SPEED_UPS
+        self.next_score_milestone = Game.SCORE_BETWEEN_SPEED_UPS
 
     def handle_click(self, mouse_pos: Tuple[int, int]) -> None:
         if self.quit_button.is_clicked(mouse_pos[0], mouse_pos[1]):
@@ -57,11 +72,13 @@ class Game(screen.Screen):
 
     def update(self) -> None:
         if self.board.dead:
-            self.events.append(screen.END_SCREEN)
-        self.board.update(self.speed)
-        self.speed = Board.NORMAL_SPEED
-        if self.board.main_block is None:
-            self.board.new_falling_block()
-        if self.get_score() == self.next_score_milestone:
-            self.events.append(SPEED_UP)
-            self.next_score_milestone += SCORE_BETWEEN_SPEED_UPS
+            self.events.extend([screen.END_SCREEN, screen.RESET_SPEED])
+        else:
+            self.board.update(self.speed)
+            # reset speed so next update isn't extra fast
+            self.speed = Board.NORMAL_SPEED
+            if self.board.main_block is None:
+                self.board.get_new_falling_block()
+            if self.get_score() == self.next_score_milestone:
+                self.events.append(screen.SPEED_UP)
+                self.next_score_milestone += Game.SCORE_BETWEEN_SPEED_UPS
