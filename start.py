@@ -17,13 +17,13 @@ from text import get_text_by_center
 # required initialization step
 pygame.init()
 
-
 class Start(screen.Screen):
     """Starting intro screen. Subclass of Screen"""
 
     def __init__(self, window: pygame.Surface) -> None:
         super().__init__(window)
         width, height = window.get_width(), window.get_height()
+        # elements on screen
         self.title = get_text_by_center('TETRIS', fonts.TITLE_FONT, (width / 2, height / 4), colors.BACKGROUND_COLOR)
         self.start_button = Button('Start', pygame.Rect(width / 4, 3 * height / 5, width / 2, height / 5),
                                    colors.FORWARD_COLOR)
