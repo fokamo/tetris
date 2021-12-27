@@ -3,10 +3,12 @@
 For external use:
 - Screen class for representing a game screen
 - EXIT_GAME, GAME_SCREEN, END_SCREEN constants and CHANGE_SCREEN array for state representation
+- SPEED_UP, RESET_SPEED constants for speed events
 """
 
 from typing import List, Tuple
 import pygame
+
 import colors
 
 
@@ -17,8 +19,9 @@ pygame.init()
 EXIT_GAME = -1
 GAME_SCREEN = -2
 END_SCREEN = -3
+SPEED_UP = -4
+RESET_SPEED = -5
 CHANGE_SCREEN = [GAME_SCREEN, END_SCREEN]
-
 
 class Screen:
     """A generic game screen
