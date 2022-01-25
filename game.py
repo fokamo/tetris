@@ -31,7 +31,7 @@ class Game(screen.Screen):
 
         height, width = window.get_height(), window.get_width()
         # elements on screen
-        self.board = Board((int(width / 5), int(height / 10)), (20, 10), 32)
+        self.board = Board((int((width - 100) / 5) + 100, int(height / 10)), (20, 10), 32)
         self.board.get_new_falling_block()
         self.quit_button = Button('Quit', pygame.Rect(0, 9 * height / 10, width / 3, height / 10),
                                   colors.BACKWARD_COLOR)
