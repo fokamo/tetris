@@ -20,7 +20,7 @@ pygame.init()
 # set up game clock
 game_clock = pygame.time.Clock()
 
-WINDOW_SIZE = (400, 800)
+WINDOW_SIZE = (500, 800)
 window = pygame.display.set_mode(WINDOW_SIZE)
 
 def main() -> None:
