@@ -1,4 +1,4 @@
-"""block.py - for a Point class
+"""block.py - for a Block class
 
 For external use:
 - Block class for representing a Tetris block
@@ -38,11 +38,11 @@ class Block:
     PIECE_INNER_BORDER = 1
 
     def __init__(self, color: pygame.Color, pos: List[Tuple[float, float]], center: Tuple[float, float],
-                 board_top_left: Tuple[int, int], square_size: int) -> None:
+                 board_left_top: Tuple[int, int], square_size: int) -> None:
         self.color = color
 
         # information for Block's squares
-        self.squares = [Square(p, square_size, board_top_left) for p in pos]
+        self.squares = [Square(p, square_size, board_left_top) for p in pos]
         self.center = Point(center)
 
         # for easy looping over later - must move each square & center point in tandem
@@ -53,7 +53,7 @@ class Block:
         size = self.squares[0].size
         for sq in self.squares:
             pygame.draw.rect(screen, self.color, sq.rect)
-            top_left = sq.rect.topleft
+            left_top = (sq.rect.left, sq.rect.top)
 
             for is_x in range(2):
                 for i in range(2):
@@ -61,11 +61,11 @@ class Block:
                     border_width = Block.PIECE_INNER_BORDER if self.has_square_at(adj) else Block.PIECE_OUTER_BORDER
 
                     # starts at left unless 2nd x (i.e. left), starts at top unless 2nd y (i.e. bottom)
-                    border_start = (top_left[0] + size if (i and is_x) else top_left[0],
-                                    top_left[1] + size if (i and not is_x) else top_left[1])
+                    border_start = (left_top[0] + size if (i and is_x) else left_top[0],
+                                    left_top[1] + size if (i and not is_x) else left_top[1])
                     # ends at right unless 1st x (i.e. right), ends at bottom unless 1st y (i.e. top)
-                    border_end = (top_left[0] + size if (i or not is_x) else top_left[0],
-                                  top_left[1] + size if (i or is_x) else top_left[1])
+                    border_end = (left_top[0] + size if (i or not is_x) else left_top[0],
+                                  left_top[1] + size if (i or is_x) else left_top[1])
                     pygame.draw.line(screen, colors.BLACK, border_start, border_end, border_width)
 
     def has_square_at(self, pt: Point) -> bool:
@@ -105,7 +105,7 @@ class Block:
 
     def remove_row(self, row: int) -> List[Block]:
         return [Block(colors.BROKEN_PIECE_COLOR, [sq.pos for sq in group], group[0].pos,
-                      self.squares[0].board_top_left, self.squares[0].size)
+                      self.squares[0].board_left_top, self.squares[0].size)
                 for group in find_connected_groups([sq for sq in self.squares if sq.pos[0] != row])]
 
     # overriding comparison methods
@@ -130,7 +130,7 @@ def make_shadow_copy(original: Block) -> Block:
     """Create a shadow-colored copy of a Block in the same position"""
 
     return Block(colors.SHADOW_COLOR, [sq.pos for sq in original.squares], original.center.pos,
-                 original.squares[0].board_top_left, original.squares[0].size)
+                 original.squares[0].board_left_top, original.squares[0].size)
 
 def find_connected_groups(points: List[Point]) -> List[List[Point]]:
     """Find connected groups of Points"""
@@ -171,39 +171,38 @@ def find_connected_groups(points: List[Point]) -> List[List[Point]]:
     return [group for group in groups if group]
 
 # factories for standard Tetris pieces
-def _make_I_block(O_bottom_left: Tuple[int, int], board_top_left: Tuple[int, int], square_size: int) -> Block:
+def _make_I_block(O_bottom_left: Tuple[int, int], board_left_top: Tuple[int, int], square_size: int) -> Block:
     return Block(colors.I_COLOR, [(O_bottom_left[0], O_bottom_left[1] - i + 1) for i in range(4)],
-                 (O_bottom_left[0] + 0.5, O_bottom_left[1] - 0.5), board_top_left, square_size)
+                 (O_bottom_left[0] + 0.5, O_bottom_left[1] - 0.5), board_left_top, square_size)
 
-def _make_O_block(O_bottom_left: Tuple[int, int], board_top_left: Tuple[int, int], square_size: int) -> Block:
+def _make_O_block(O_bottom_left: Tuple[int, int], board_left_top: Tuple[int, int], square_size: int) -> Block:
     return Block(colors.O_COLOR, [(O_bottom_left[0] - i, O_bottom_left[1] - j) for i in range(2) for j in range(2)],
-                 (O_bottom_left[0] - 0.5, O_bottom_left[0] - 0.5), board_top_left, square_size)
+                 (O_bottom_left[0] - 0.5, O_bottom_left[0] - 0.5), board_left_top, square_size)
 
-def _make_T_block(O_bottom_left: Tuple[int, int], board_top_left: Tuple[int, int], square_size: int) -> Block:
+def _make_T_block(O_bottom_left: Tuple[int, int], board_left_top: Tuple[int, int], square_size: int) -> Block:
     straight = [(O_bottom_left[0], O_bottom_left[1] + 1 - i) for i in range(3)]
     straight.append((O_bottom_left[0] - 1, O_bottom_left[1]))
-    return Block(colors.T_COLOR, straight, O_bottom_left, board_top_left, square_size)
+    return Block(colors.T_COLOR, straight, O_bottom_left, board_left_top, square_size)
 
-def _make_S_block(O_bottom_left: Tuple[int, int], board_top_left: Tuple[int, int], square_size: int) -> Block:
+def _make_S_block(O_bottom_left: Tuple[int, int], board_left_top: Tuple[int, int], square_size: int) -> Block:
     return Block(colors.S_COLOR, [(O_bottom_left[0] - i, O_bottom_left[1] - j + 1 - i)
-                                  for i in range(2) for j in range(2)], O_bottom_left, board_top_left, square_size)
+                                  for i in range(2) for j in range(2)], O_bottom_left, board_left_top, square_size)
 
-def _make_Z_block(O_bottom_left: Tuple[int, int], board_top_left: Tuple[int, int], square_size: int) -> Block:
+def _make_Z_block(O_bottom_left: Tuple[int, int], board_left_top: Tuple[int, int], square_size: int) -> Block:
     return Block(colors.Z_COLOR, [(O_bottom_left[0] - i, O_bottom_left[1] - j + i)
-                                  for i in range(2) for j in range(2)], O_bottom_left, board_top_left, square_size)
+                                  for i in range(2) for j in range(2)], O_bottom_left, board_left_top, square_size)
 
-def _make_J_block(O_bottom_left: Tuple[int, int], board_top_left: Tuple[int, int], square_size: int) -> Block:
+def _make_J_block(O_bottom_left: Tuple[int, int], board_left_top: Tuple[int, int], square_size: int) -> Block:
     straight = [(O_bottom_left[0], O_bottom_left[1] + 1 - i) for i in range(3)]
     straight.append((O_bottom_left[0] - 1, O_bottom_left[1] + 1))
-    return Block(colors.J_COLOR, straight, O_bottom_left, board_top_left, square_size)
+    return Block(colors.J_COLOR, straight, O_bottom_left, board_left_top, square_size)
 
-def _make_L_block(O_bottom_left: Tuple[int, int], board_top_left: Tuple[int, int], square_size: int) -> Block:
+def _make_L_block(O_bottom_left: Tuple[int, int], board_left_top: Tuple[int, int], square_size: int) -> Block:
     straight = [(O_bottom_left[0], O_bottom_left[1] + 1 - i) for i in range(3)]
     straight.append((O_bottom_left[0] - 1, O_bottom_left[1] - 1))
-    return Block(colors.L_COLOR, straight, O_bottom_left, board_top_left, square_size)
+    return Block(colors.L_COLOR, straight, O_bottom_left, board_left_top, square_size)
 
-def random_block(columns: int, board_top_left: Tuple[int, int], square_size: int) -> Block:
-    """Create a random standard Tetris piece in the middle of the top of the field"""
+def random_block(O_bottom_left: Tuple[int, int], board_left_top: Tuple[int, int], square_size: int) -> Block:
+    """Create a random standard Tetris piece"""
     return random.choice((_make_I_block, _make_O_block, _make_T_block, _make_S_block,
-                          _make_Z_block, _make_J_block, _make_L_block))((0, int(columns / 2)),
-                                                                        board_top_left, square_size)
+                          _make_Z_block, _make_J_block, _make_L_block))(O_bottom_left, board_left_top, square_size)
